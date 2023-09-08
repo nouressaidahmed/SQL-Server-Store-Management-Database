@@ -1,0 +1,108 @@
+--Database : StoreManagement
+CREATE DATABASE StoreManagement
+Go
+USE StoreManagement
+GO
+-- Table 1: Products
+CREATE TABLE Products (
+    ProductID INT PRIMARY KEY identity(1,1),
+    ProductName VARCHAR(255) NOT NULL,
+    Category VARCHAR(50),
+    Price DECIMAL(10, 2) NOT NULL,
+    StockQuantity INT NOT NULL
+);
+Go
+-- Table 2: Customers
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY identity(1,1),
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Email VARCHAR(100) UNIQUE,
+    Phone VARCHAR(20)
+);
+GO
+-- Table 3: Orders
+CREATE TABLE Orders (
+    OrderID INT PRIMARY KEY identity(1,1),
+    CustomerID INT NOT NULL,
+    OrderDate DATE NOT NULL,
+    TotalAmount DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+GO
+-- Table 4: OrderDetails
+CREATE TABLE OrderDetails (
+    OrderDetailID INT PRIMARY KEY identity(1,1),
+    OrderID INT NOT NULL,
+    ProductID INT NOT NULL,
+    Quantity INT NOT NULL,
+    UnitPrice DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+GO
+-- Table 5: Suppliers
+CREATE TABLE Suppliers (
+    SupplierID INT PRIMARY KEY identity(1,1),
+    SupplierName VARCHAR(100) NOT NULL,
+    ContactName VARCHAR(50),
+    Email VARCHAR(100) UNIQUE,
+    Phone VARCHAR(20)
+);
+Go
+CREATE VIEW OrderDetailsView AS
+SELECT
+    O.OrderID,
+    O.OrderDate,
+    C.FirstName AS CustomerFirstName,
+    C.LastName AS CustomerLastName,
+    P.ProductName,
+    OD.Quantity,
+    OD.UnitPrice
+FROM Orders O
+JOIN Customers C ON O.CustomerID = C.CustomerID
+JOIN OrderDetails OD ON O.OrderID = OD.OrderID
+JOIN Products P ON OD.ProductID = P.ProductID;
+Go
+-- Remplissage de la table Products
+INSERT INTO Products (ProductName, Category, Price, StockQuantity)
+VALUES
+    ('Smartphone', 'Electronics', 599.99, 100),
+    ('Laptop', 'Electronics', 999.99, 50),
+    ('T-Shirt', 'Apparel', 19.99, 500),
+    ('Running Shoes', 'Footwear', 79.99, 200),
+    ('Coffee Maker', 'Appliances', 49.99, 75);
+
+-- Remplissage de la table Customers
+INSERT INTO Customers (FirstName, LastName, Email, Phone)
+VALUES
+    ('John', 'Doe', 'johndoe@example.com', '123-456-7890'),
+    ('Jane', 'Smith', 'janesmith@example.com', '987-654-3210'),
+    ('Robert', 'Johnson', 'robertjohnson@example.com', '555-123-4567'),
+    ('Emily', 'Davis', 'emilydavis@example.com', '333-999-8888'),
+    ('Michael', 'Brown', 'michaelbrown@example.com', '777-444-5555');
+
+-- Remplissage de la table Orders
+INSERT INTO Orders (CustomerID, OrderDate, TotalAmount)
+VALUES
+    (1, '2023-09-01', 699.98),
+    (2, '2023-09-02', 139.98),
+    (3, '2023-09-03', 199.97),
+    (4, '2023-09-04', 59.99),
+    (5, '2023-09-05', 399.96);
+
+-- Remplissage de la table OrderDetails
+INSERT INTO OrderDetails (OrderID, ProductID, Quantity, UnitPrice)
+VALUES
+    (1, 1, 2, 599.99),
+    (2, 3, 3, 19.99),
+    (3, 2, 1, 999.99),
+    (4, 5, 2, 79.99),
+    (5, 4, 4, 49.99);
+
+-- Remplissage de la table Suppliers
+INSERT INTO Suppliers (SupplierName, ContactName, Email, Phone)
+VALUES
+    ('ElectroTech Inc.', 'John Supplier', 'electrotech@example.com', '111-222-3333'),
+    ('FashionHub LLC', 'Emma Supplier', 'fashionhub@example.com', '444-555-6666'),
+    ('ShoeWorld', 'David Supplier', 'shoeworld@example.com', '777-888-9999');
